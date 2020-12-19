@@ -233,3 +233,8 @@ JVM의 구성요소는 총 네 가지 구성요소를 가지고 있다.
   JDK는 JRE에서 제공하는 실행 환경 뿐만 아니라 자바 개발에 필요한 여러가지 명령어 그리고 컴파일러를 포함한다. 즉, 자바로 프로그래밍을 할 수 있고, 컴파일까지도 할 수 있다.
 
 ![https://t1.daumcdn.net/cfile/tistory/2232C53C5731E7EC17](https://t1.daumcdn.net/cfile/tistory/2232C53C5731E7EC17)
+참고자료
+
+[https://jusungpark.tistory.com/13](https://jusungpark.tistory.com/13)
+
+[https://goodgid.github.io/Java-JDK-JRE/](https://goodgid.github.io/Java-JDK-JRE/)
