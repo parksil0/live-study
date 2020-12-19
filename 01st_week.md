@@ -104,5 +104,123 @@
 [https://heewon26.tistory.com/207](https://heewon26.tistory.com/207)
 
 ## JVM의 구성 요소
+JVM의 구성요소는 총 네 가지 구성요소를 가지고 있다.
+
+- Class Loader
+
+  자바에서 클래스가 로딩 되는 과정은 클래스 로더가 확장자 .class 파일의 위치를 찾아 그것을 JVM 위에 올려놓는 과정을 뜻한다.
+
+  ![https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=http%3A%2F%2Fcfile4.uf.tistory.com%2Fimage%2F999ECB375BE900A016E768](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=http%3A%2F%2Fcfile4.uf.tistory.com%2Fimage%2F999ECB375BE900A016E768)
+
+  자료 출처 : [https://engkimbs.tistory.com/606](https://engkimbs.tistory.com/606)
+
+  클래스 로더들은 계층적 구조를 가지도록 생성이 가능하고, 각 부모 클래스 로더에서 자식들 로더를 가지는 형태로 클래스 로더를 만들 수 있다.
+
+  위와 같은 구조를 가지고 있다.
+
+  위의 구조 중 부트스트랩 클래스 로더와 확장 클래스 로더에 대해 좀 더 알아보자.
+
+  - 부트스트랩 클래스 로더(Bootstrap Class Loader)
+
+    rt.jar에 있는 JVM을 실행시키기 위한 핵심 클래스들을 로딩한다.
+
+  - 확장 클래스 로더(Extension Class Loader)
+
+    자바의 확장 클래스들을 로딩하는 역할을 한다. 좀 더 자세히 말하자면, classpath에 설정된 경로를 탐색하여 그 곳에 있는 클래스들을 로딩하는 역할을 한다. 즉, 사용자가 개발한 class 확장자 파일을 확장 클래스 로더가 로딩한다.
+
+  - 로딩 요청 위임(순서)
+
+    위의 그림자료를 통해 알 수 있는 건 하나의 구조를 이루고 있다는 것이다. 그 밑의
+
+    > *Bootstrap ← Extension ← System ← User-defined*
+
+    을 보면 어떠한 순서를 암시하는 듯한 느낌을 준다. 이는 Delegate Load Request의 동작 과정에서의 힌트를 얻을 수 있다.
+
+    1. System Loader → Extension Class Loader
+    2. Extension Class Loader → Bootstrap Loader
+
+    위의 순서에서 알 수 있는 사실은 맨 위(Bootstrap Loader)에서 찾을 수 없으면 밑으로 계속 요청을 하고 마지막 System Loader에서 못 찾을시 에러를 호출한다.
+
+- Garbage Collector
+
+  가비지 컬렉터란 말 그대로 가비지(쓰레기) 데이터를 수집하는 것을 뜻한다. 좀 더 풀어서 말하자면, 정리되지 않은, 유효하지 않은 메모리(가비지)를 정리해 주는 것이다.
+
+  - Garbage는 어떻게 발생하는가?
+
+      ```java
+      public class Main {
+          public static void main(String[] args) {
+              String url = "https://";
+              url += "google.com";
+              System.out.println(url); // https://google.com
+          }
+      }
+
+      ```
+
+    위의 String 타입의 url 변수는 stack에 할당되고, heap에는 타입과 정의된 내용이 할당되었다. 그리고나서 url을 덧붙이는 연산이 수행된 것을 확인할 수 있다.
+
+    여기서 중요한건 heap 에서는 "https://"에 "google.com"을 덧붙여서 할당 되는게 아니라 "https://" 따로 "https://google.com" 따로 할당되게 된다.
+
+    그러므로 원래 처음의 "https://"는 참조하지 않게 되고 새로운 "https://google.com"에 참조하게 된다.
+
+    그렇게 되면 처음의 "https://" 에서는 더이상 어떠한 것도 참조하지 않게 된다.
+
+  - 가비지 컬렉터의 실행 과정
+
+    GC(Garbage Collector)는 먼저 Unreachable Object를 우선적으로 메모리에서 제거한다. Unreachable Object는 stack에서 도달 할 수 없는 heap 영역의 객체를 말하는 것으로, 아까의 예제의 "https://"를 보면 이해가 될 것이다.
+
+    위와 같은 과정을 Mark and Sweep이라고도 한다. GC는 stack의 모든 변수를 스캔하면서 어떤 object를 참조하고 있는지의 과정이 Mark, 그리고나서 Mark 되어있지 않은 모든 object들을 heap에서 제거하는 일을 Sweep이라고 한다.
+
+- Execution Engine
+
+  Class Loader에 의해 JVM으로 load된 class 파일들을 실행하는 Runtime Module이 Execution Engine(실행 엔진)이다. 이는 두가지 실행 방식이 있다.
+
+  1. Interpreter 방식
+
+     바이트 코드를 한 줄씩 해석하여 실행하는 방식으로, 초기에 사용했으며 속도가 느린 단점이 있다.
+
+  2. JIT 컴파일 방식 또는 동적 번역
+
+     초기에 실행한 Interpreter 방식의 단점을 보완한 것이 JIT compiler 방식이다. 하지만 변환의 비용이 발생하기 때문에 Interpreter와 JIT 컴파일러 둘을 혼용하여 실행한다. JIT는 위에 있으니 참고하면 된다.
+
+- Runtime Data Area
+
+  Runtime Data Area는 JVM이 프로그램을 수행하기 위해 운영체제로부터 할당 받는 메모리 영역이다. 이는 다섯개의 영역으로 나뉜다.
+
+  - PC Register
+
+    Thread가 생성될 때마다 생기는 공간으로 Thread가 어떠한 명령을 실행하기 될지에 대한 부분을 기록한다.
+
+    JVM은 Stacks-Base 방식으로 작동하는데, JVM은 CPU에 직접 Instruction을 수행하지 않고, Stack에서 Operand(피연산자)를 뽑아내 이를 별도의 메모리 공간에 저장하는 방식을 취하는데, 이러한 메모리 공간을 PC Register라고 한다.
+
+  - Method Area
+
+    프로그램 실행 중 어떤 클래스가 사용되면, JVM은 해당 클래스의 클래스파일을 읽어서 분석하여 클래스에 대한 정보(클래스 데이터)를 이곳에 저장한다. 이 때, 그 클래스의 클래스변수도 이 영역에 함께 생성된다.
+
+  - Heap
+
+    인스턴스가 생성되는 공간이다. 프로그램 실행 중 생성되는 인스턴스는 모두 이 곳에 생성된다. 즉, 인스턴스 변수들이 생성되는 공간이다.
+
+  - JVM Stacks
+
+    각 쓰레드마다 하나씩 존재하며 쓰레드가 시작될 때 할당된다. 자바 프로그램에서 추가적으로 쓰레드를 생성하지 않았다면 main 쓰레드만 존재하므로 JVM 스택도 하나이다.
+
+    JVM 스택은 메소드를 호출할 때마다 프레임을 추가하고, 메소드가 종료되면 해당 프레임을 제거하는 동작을 수행한다.
+
+    프레임 내부에는 로컬 변수 스택이 있는데, 기본 타입 변수와 참조 타입 변수가 추가되거나 제거된다. 변수가 이 영역에 생성되는 시점은 초기화 될 때, 즉 최초로 변수에 값이 저장될 때이다. 자바에서 초기화를 하지 않으면 안되는 이유는 변수는 선언된 블록에서만 스택에 존재하고 블록을 벗어나면 스택에서 제거되기 때문이다.
+
+  - Native Method Stacks
+
+    자바 외의 언어로 작성된 네이티브 코드를 위한 스택. Java Native Interface를 통해 호출하는 C/C++ 코드를 수행하기 위한 스택이다.
+
+자료참조
+
+[https://engkimbs.tistory.com/606](https://engkimbs.tistory.com/606)
+[https://yaboong.github.io/java/2018/06/09/java-garbage-collection/](https://yaboong.github.io/java/2018/06/09/java-garbage-collection/)
+
+[https://velog.io/@litien/가비지-컬렉터GC](https://velog.io/@litien/%EA%B0%80%EB%B9%84%EC%A7%80-%EC%BB%AC%EB%A0%89%ED%84%B0GC)
+
+[https://smjeon.dev/etc/jvm-rda/](https://smjeon.dev/etc/jvm-rda/)[https://www.holaxprogramming.com/2013/07/16/java-jvm-runtime-data-area/](https://www.holaxprogramming.com/2013/07/16/java-jvm-runtime-data-area/)
 
 ## JDK와 JRE의 차이
