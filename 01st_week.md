@@ -224,3 +224,12 @@ JVM의 구성요소는 총 네 가지 구성요소를 가지고 있다.
 [https://smjeon.dev/etc/jvm-rda/](https://smjeon.dev/etc/jvm-rda/)[https://www.holaxprogramming.com/2013/07/16/java-jvm-runtime-data-area/](https://www.holaxprogramming.com/2013/07/16/java-jvm-runtime-data-area/)
 
 ## JDK와 JRE의 차이
+- JRE
+
+  JRE는 JVM이 자바 프로그램을 동작 시킬 때 필요한 라이브러리 파일들과 기타 파일들을 가지고 있다. 즉, 자바 애플리케이션을 실행하기 위한 최소의 실행 환경을 제공한다.
+
+- JDK
+
+  JDK는 JRE에서 제공하는 실행 환경 뿐만 아니라 자바 개발에 필요한 여러가지 명령어 그리고 컴파일러를 포함한다. 즉, 자바로 프로그래밍을 할 수 있고, 컴파일까지도 할 수 있다.
+
+![https://t1.daumcdn.net/cfile/tistory/2232C53C5731E7EC17](https://t1.daumcdn.net/cfile/tistory/2232C53C5731E7EC17)
