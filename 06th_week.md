@@ -239,6 +239,132 @@
 
 ## 추상 클래스
 
+- 추상 클래스란?
+
+  추상클래스란 추상메서드를 포함하고 있는 클래스로, 추상메서드가 있는 특징을 제외하면 일반 클래스와 큰 차이는 없다. 생성자를 생성할 수 있고, 멤버변수와 메서드도 가질 수 있다.
+
+  앞서 설명했듯 추상클래스는 완전한 클래스의 역할을 할 수 없지만 새로운 클래스를 작성하는데 있어 바탕이 되는 조상클래스로서 중요한 역할을 한다. 실생활을 비유로 하면 냉장고로 예시를 들 수 있다. 냉장고도 여러 가지의 냉장고가 있다. 김치 냉장고, 와인 냉장고, 화장품 냉장고 등 이 냉장고들의 온도를 유지하는 방법은 동일할 것이다. 그렇다면 각자 따로 설계하는 것보다 공통부분만을 설계해놓은 설계도를 만들어 놓고,  각자의 특징에 맞는 부분만 따로 설계하는 것이 더욱 효율적일 것이다. 다시 돌아와서, 추상 클래스는 위의 예시처럼 클래스를 사용 할 때, 클래스 선언부의 abstract를 보고 상속을 통해 추상 메서드를 구현해야하는 것을 이해할 수 있어야 한다.
+
+  아래의 코드를 통해 작성 방법과 구현방법에 대해 간단히 알아보겠다.
+
+- 추상 클래스, 추상 메서드 작성 방법
+
+    ```java
+    abstract class Refrigerator { //1번
+        //온도 조절하는 기능
+        abstract void maintainTprt(int temperature);
+    }
+
+    class Kimchi_refrigerator extends Refrigerator {// 2번
+
+        @Override
+        void maintainTprt(int temperature) {
+            System.out.println("온도 " + temperature + "로 유지");
+        }
+    }
+    ```
+
+  맨 위 1번은 추상 클래스를 생성했다. 냉장고라는 추상 클래스에 설정한 온도를 유지하는 기능인 추상 메서드를 추가했다. 위에서 보면 알 수 있듯, 추상 클래스 또는 추상 메서드를 작성할 때 'abstract' 라는 키워드를 앞에 붙여준다. 그 다음은 2번인 구현하려는 클래스 부분으로, 선언부 끝부분에 'extends Refrigerator' 는 추상 클래스를 구현하겠다는 뜻이다.  만약 추상클래스의 추상메서드를 구현하지 않으면 아래와 같은 경고가 표시된다.
+  
+  ![img_1.png](images/img_1.png)
+  *'Class 'Kimchi_refrigerator' must either be declared abstract or implement abstract method 'maintainTprt(int)' in 'Refrigerator''*
+
+  쉽게 말해 구현하라는 뜻이다. 해당 추상 클래스의 추상 메서드를 모두 구현하면 경고는 사라지게 된다.
+
+  혹시라도 상속 받은 추상 메서드 중 하나라도 구현하지 않는다면, 자손 클래스 역시 추상클래스로 지정해야 한다.
+
+    ```java
+    abstract class Refrigerator {
+        //온도 조절하는 기능
+        abstract void maintainTprt(int temperature);
+    }
+
+    abstract class Kimchi_refrigerator extends Refrigerator {
+
+    }
+    ```
+
+  'Kimchi_refrigerator' 클래스의 선언부 'abstract'가 위의 코드의 핵심 부분이다.
+
+  ![img_2.png](images/img_2.png)
+
+  'abstract' 키워드를 추가하면 아까와는 다른 결과를 보여준다.
+
+자료참조
+
+자바의 정석 3rd Edition(남궁 성 저)
+
 ## final 키워드
+
+- final 이란?
+
+  final은 제어자 중의 하나로 클래스, 변수, 메서드 선언부에 함께 사용되어 부가적인 의미를 부여해준다. final 이외에 static, abstract 등등 여러가지를 함께 사용할 수도 있다. 그 중 final을 사용하면 클래스, 변수, 메서드가 어떻게 적용되는지에 대해 알아보자.
+  
+  |<center>대상</center>|<center>의미</center>|
+  |:------|:---|
+  |클래스|변경될 수 없는 클래스, 확장될 수 없는 클래스가 된다. 그래서 final로 지정된 클래스는 다른 클래스의 조상이 될 수 없다.|
+  |메서드|변경될 수 없는 메서드, final로 지정된 메서드는 오버라이딩을 통해 재정의 될 수 없다.|
+  |멤버변수, 지역변수|변수 앞에 final이 붙으면, 값을 변경할 수 없는 상수가 된다.|
+  
+
+  위의 표를 통해 final은 Immutable/Read-only 속성을 선언하는 지시어라는 것을 알 수 있다. 변수에 사용되면 값을 변경할 수 없는 상수가 되며, 메서드에 사용하면 오버라이드가 안되고, 클래스에서 사용하게 되면 확장될 수 없는 클래스가 된다. 아래 코드를 통해 알아보자.
+
+- 각 대상 별 작성 방법
+  - 클래스
+
+      ```java
+      public final class FinalClass {
+          //...
+      }
+
+      public class TestClass extends FinalClass {
+          //...
+      }
+      ```
+
+    TestClass 클래스에서 FinalClass를 상속 받으려 한다면, *'Cannot inherit from final 'FinalClass''* 과 같은 오류가 발생한다. final class의 예시로 String 클래스가 있다.
+
+  - 메서드
+
+      ```java
+      class FinalTest {
+          void method1() {}
+          final void method2() {};
+      }
+
+      class MainTest extends FinalTest {
+
+          @Override
+          void method1() {
+              super.method1(); // 1번 Override 가능
+          }
+          
+          void method2() {}; // 2번 'method2()' cannot override 'method2()' in 'FinalTest'; overridden method is final
+      }
+      ```
+
+    1번 method1() 메소드는 정상적으로 오버라이딩이 되었지만 2번에서의 method2() 메서드는 오버라이딩을 할 수 없는 상태라는 것을 알 수 있다. 이는 조상 클래스 FinalTest의 method2() 메서드가 final 제어자가 추가되었기 때문이다.
+
+  - 변수
+
+      ```java
+      class MainTest{
+
+          final double PI = 3.14;
+          
+          void method1() {
+              PI = 3.141; // 2번 Cannot assign a value to final variable 'PI'
+          }
+          
+      }
+      ```
+
+    위는 상수를 선언할 때의 경우이다. 보통 변수명은 대문자로 하는 것이 일반적이고, 한번 선언되면 변경이 불가하다는 특징을 가지고있다. 2번의 경우에는 오류가 발생한다.
+
+자료참조
+
+자바의 정석 3rd Edition(남궁 성 저)
+
+[https://blog.lulab.net/programming-java/java-final-when-should-i-use-it/](https://blog.lulab.net/programming-java/java-final-when-should-i-use-it/)
 
 ## Object 클래스
