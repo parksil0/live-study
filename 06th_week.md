@@ -368,3 +368,124 @@
 [https://blog.lulab.net/programming-java/java-final-when-should-i-use-it/](https://blog.lulab.net/programming-java/java-final-when-should-i-use-it/)
 
 ## Object 클래스
+
+- java.lang 패키지는 자바 프로그래밍에 가장 기본이 되는 클래스들을 포함한다. 그 중 Object 클래스는 모든 클래스의 최고 조상이다. Object 클래스에는 열 한개의 메서드만을 가지고있다. 아래는 Object 클래스가 가지고있는 열 한개의 클래스이고, 그 중 몇가지에 대해 알아보도록 하자. (참고로 오라클에서도 [Object 클래스](https://docs.oracle.com/javase/8/docs/api/)에 대해 친절하게 설명한다.)
+
+  |<center>메서드 이름</center>|<center>설명</center>|
+    |:------|:---|
+  |protected Object clone()|객체 자신의 복사본을 반환한다.|
+  |boolean equals(Object obj)|객체 자신과 객체 obj가 같은 객체인지 알려준다.(같으면 true)|
+  |protected void finalize()|객체가 소멸될 때 가비지 컬렉터에 의해 자동적으로 호출된다. 이 때 수행되어야 하는 코드가 있을 때 오바리이딩 한다.(거의 사용안 함)|
+  |Class<?> getClass()|객체 자신이 클래스 정보를 담고 있는 Class 인스턴스를 반환한다.|
+  |int hashcode()|객체 자신의 해시코드를 반환한다.|
+  |void notify()|객체 자신을 사용하려고 기다리는 쓰레드 하나만을 깨운다.|
+  |void notifyAll()|객체 자신을 사용하려고 기다리는 모든 쓰레드를 깨운다.|
+  |String toString()|객체 자신의 정보를 문자열로 반환한다.|
+  |void wait(),void wait(long timeout),void wait(long timeout, int nanos)|다른 쓰레드가 notify()나 notifyAll()을 호출할 때까지 현재 쓰레드를 무한히 또는 지정된 시간(timeout, nanos)동안 기다리게 한다.(timeout은 milliseconds, nanos는 1/10^9초)|
+
+  이 중 자주 쓰이고, 클래스를 정의할 때 자주 오버라이딩 하는 메서드에 대해 좀 더 자세하게 설명하려 한다. 그 중 equals() 메소드와 toString() 메서드에 대해 좀 더 자세히 알아보자.
+
+  - equals(Object obj)
+
+    매개변수로 객체의 참조변수를 받아 비교하여 결과를 true or false로 반환하는 메서드이다. 주의해야 할 점은 비교하려는 객체가 서로 다르다면 항상 false를 리턴한다.
+
+      ```java
+      public class test {
+
+          public static void main(String[] args) {
+
+              Toy toy1 = new Toy("robot");
+              Toy toy2 = new Toy("robot");
+
+              System.out.println(toy1.equals(toy2));// false
+          }
+
+      }
+
+      class Toy {
+          String name;
+
+          Toy(String name) {
+              this.name = name;
+          }
+      }
+      ```
+
+    그 이유는 주소값을 이용하여 비교하기 때문이다. Toy라는 클래스에서 생성된 객체들은 각각의 주소를 할당받기 때문에 둘은 equals 메소드를 이용하면 false를 리턴한다. 만약 둘을 equals 했을 때 true를 리턴 받으려면 둘의 주소가 같아야한다.
+
+      ```java
+      toy1 = toy2
+      System.out.println(toy1.equals(toy2));// true;
+      ```
+
+    toy2의 주소를 toy1에 대입하여 실행하면 true가 리턴되는 것을 확인할 수 있다.
+
+    - 메소드 오버라이딩을 이용하여 equals() 메소드를 바꾸어보자.
+
+        ```java
+        class Toy {
+            String name;
+
+            @Override
+            public boolean equals(Object obj) {
+                if( obj instanceof Toy) {
+                    return name == ((Toy)obj).name;
+                } else {
+                    return false;
+                }
+            }
+
+            Toy(String name) {
+                this.name = name;
+            }
+        }
+        ```
+
+      오버라이드 된 메소드의 if문을 보면 instanceof를 사용하여 객체의 타입을 확인하고 서로의 변수가 같은지를 확인한 다음 리턴하는 메서드를 작성하였다. 위의 클래스에서 equals를 재정의하면 객체의 주소값이 다르더라도 true를 리턴한다는 것을 알 수 있다. 비슷한 예로 String 클래스에서도 그 객체가 갖는 문자열 값을 비교하도록 되어있다.
+
+  - toString()
+
+    이 메서드는 인스턴스에 대한 정보를 String 타입으로 반환하는 메서드이다. 주로 정보제공을 위한 메서드인데, 변수에 저장된 값들에 대해 반환되는것이 일반적이다. 기본으로 제공되는 toString() 메서드는 클래스 이름에 16진수의 해시코드를 반환하기 때문에 위에서 설명한 일반적으로 반환하기 위해서는 오버라이딩을 해야한다.
+
+      ```java
+      public class test {
+
+          public static void main(String[] args) {
+
+              Toy toy1 = new Toy("robot");
+              Toy toy2 = new Toy("princess");
+
+              System.out.println(toy1.toString()); //Toy{name='robot'}
+              System.out.println(toy2.toString()); //Toy{name='princess'}
+          }
+
+      }
+
+      class Toy {
+          String name;
+
+          Toy(String name) {
+              this.name = name;
+          }
+
+          @Override
+          public String toString() {
+              return "Toy{" +
+                      "name='" + name + '\'' +
+                      '}';
+          }
+      }
+      ```
+
+    클래스 Toy를 보면 override된 toString() 메서드를 볼 수 있다. 위의 메소드는 인텔리제이에서 제공하는 toString() 메소드를 그대로 사용한 것으로, 필요에 따라 수정할 수 있다.
+
+      ```java
+      @Override
+      public String toString() {
+          return "장난감의 이름은 " + name + "입니다.";
+      }
+
+      //-------------------------콘솔-----------------------------
+      //장난감의 이름은 robot입니다.
+      //장난감의 이름은 princess입니다.
+      ```
