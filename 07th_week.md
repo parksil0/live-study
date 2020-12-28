@@ -25,6 +25,72 @@
 자바의 정석 3rd Edition(남궁 성 저)
 
 ## import 키워드
+- import란?
+
+  다른 패키지의 클래스를 사용하려면 패키지명이 포함된 클래스 이름을 사용해야 한다. 하지만 매번 패키지명을 붙여 작성하기엔 매우 불편하다. 이를 위해 import문으로 사용하고자 하는 클래스의 패키지를 미리 명시하기만 하면 클래스이름에서 패키지명은 생략이 가능하다.
+
+  소스코드를 컴파일 할 때 컴파일러는 import문을 통해 소스파일에 사용된 클래스들의 패키지를 알아 낸 다음, 모든 클래스 이름 앞에 패키지명을 붙여준다.
+
+- import문 사용 방법
+
+  import를 선언할 때 클래스의 상단에 위치해야 한다. import선언을 하고난 다음에야 패키지 명을 생략하고 클래스 이름으로만 호출할 수 있다.
+
+    ```java
+    package me.whiteship // 1번
+
+    import java.util.Arrays; // 2번
+
+    public class Test {
+
+        public static void main(String[] args) {
+            String heights = "100,200,300,400,500";
+            String[] arr = heights.split(",");
+
+            System.out.println(Arrays.toString(arr)); // [100, 200, 300, 400, 500]
+
+        }
+    }
+    ```
+
+  1번은 패키지의 선언이다. 위의 package 키워드 부분을 보면 이해할 수 있다.
+
+  2번은 import를 선언하였다. 선언할 때에는 패키지명 + 클래스 명 임을 알 수 있다. 만약 같은 패키지의 클래스가 두개 이상이라면 클래스 명을 입력하는 대신 '*' 로 하여 그 패키지의 모든 클래스를 import할 수도 있다.
+
+    ```java
+    import java.util.Arrays;
+    import java.util.Date;
+    ```
+
+  위의 코드를
+
+    ```java
+    import java.util.*;
+    ```
+
+  위와 같이 사용 가능하다.
+
+  다만 반드시 패키지명은 끝까지 입력해야한다. 클래스 명 대신에 '*' 입력이 가능한 것이지, 패키지 명 마저 '*'를 입력하여 사용할 수는 없다.
+
+- static import
+
+  보통 클래스의 static 메소드를 사용할 때에는 '클래스명.static 메소드' 와 같이 사용한다. static 또한 import가 가능하다.
+
+    ```java
+    import static java.lang.Math.random;
+
+    public class test {
+
+        public static void main(String[] args) {
+    			System.out.println( (ramdom() * 10) + 1 ); // 1 ~ 10 사이의 수를 출력한다.
+    		}
+    }
+    ```
+
+  원래라면 Math.random() 이라고 입력해야 하지만, static import를 선언했기 때문에 위처럼 사용할 수 있다. 만약 특정 static 메소드를 자주 사용해야 하는 경우라면 import를 하는 것이 더 간략한 코드를 짤 수 있다.
+
+자료참조
+
+자바의 정석 3rd Edition(남궁 성 저)
 
 ## 클래스패스
 
