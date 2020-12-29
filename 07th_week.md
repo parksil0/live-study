@@ -93,9 +93,28 @@
 자바의 정석 3rd Edition(남궁 성 저)
 
 ## 클래스패스
+- 클래스패스란?
+
+  JVM이 시작될 때 JVM의 클래스 로더는 클래스패스 환경 변수를 호출한다. 그래서 환경 변수에 설정되어있는 디렉토리가 호출되면 그 디렉토리에 있는 클래스들을 먼저 JVM에 로드한다. 그러므로 클래스패스 환경 변수에는 필드 클래스들이 위치한 디렉토리를 등록하도록 한다.
+
+자료참조
+
+[https://blog.opid.kr/62](https://blog.opid.kr/62)
 
 ## CLASSPATH 환경변수
+- 클래스패스 환경변수 추가
 
+  제어판 → 시스템 → 고급 시스템 설정 → 환경변수로 들어가면 아래와 같은 화면이 보일 것이다.
+
+  ![https://t1.daumcdn.net/cfile/tistory/2213D74253DB3DCC06](https://t1.daumcdn.net/cfile/tistory/2213D74253DB3DCC06)
+
+  출처 : [https://blog.opid.kr/62](https://blog.opid.kr/62)
+
+  새로 만들기를 클릭한 후 변수 이름은 'CLASSPATH'로, 값은 설치된 경로의 lib를 경로로 설정한다.
+
+자료참조
+
+[https://blog.opid.kr/62](https://blog.opid.kr/62)
 ## classpath 옵션
 
 ## 접근지시자
