@@ -116,5 +116,90 @@
 
 [https://blog.opid.kr/62](https://blog.opid.kr/62)
 ## classpath 옵션
+- 클래스패스 옵션이란?
+
+  컴파일러가 컴파일 하기 위해 필요로 하는 클래스 파일들을 찾기 위해 컴파일 시 경로를 지정해주는 옵션이다.
+
+- 일반적인 옵션 사용 방법
+
+    ```java
+    javac -classpath /*클래스파일 경로*/ /*자바파일 경로*/
+    ```
+
+  자바파일을 클래스파일로 컴파일시키는 명령문이다. 자바파일의 경로가 'C:Java'에 있고, 클래스파일로 변환된 파일을 'C:Class'로 설정한다면,
+
+    ```java
+    javac -cp C:Class C:Java
+    ```
+
+  위와같이 입력할 수 있다. 또한 '-classpath'를 'cp'로 줄여서 사용 가능하다.
+
+  그리고, 여기서 주의해야 할 점은 각 경로 사이에 한 칸의 공백이 있다는 점이다.
+
+- 환경변수를 이용한 사용 방법
+
+    ```java
+    javac -cp ".;lib" Test.java
+    ```
+
+  위는 클래스패스를 이용하여 자바파일을 클래스파일로 컴파일하는 명령어이다. 가운데 ".;lib"는 위에서 클래스패스 변수 값으로 등록했던 경로이다.
+
+    ```java
+    java -cp ".;lib" Test
+    ```
+
+  위의 코드는 클래스패스에서 Test라는 클래스파일을 실행하는 명령어이다.
+
+  위의 코드 중간에 경로 구분자인 세미콜론(';')이 있는 것을 볼 수 있다. 이는 윈도우에서는 세미콜론이 쓰이며, 리눅스와 맥에서는 세미콜론이 아닌 콜론(':')을 사용한다는 차이점을 알아두어야 한다.
+
+자료참조
+
+[https://velog.io/@welloff_jj/200913TIL](https://velog.io/@welloff_jj/200913TIL)
+
+[https://payoff.tistory.com/401](https://payoff.tistory.com/401)
 
 ## 접근지시자
+
+- 접근 지시자란?
+
+  접근 지시자는 멤버 또는 클래스에 사용되어, 해당하는 멤버 도는 클래스를 외부에서 접근하지 못하도록 지시하는 역할을 한다.
+  public, protected, default, private 총 네개의 접근지시자가 있다. 이중 default는 생략이 가능하다.
+  ![https://t1.daumcdn.net/cfile/tistory/11791C404E74C2B719](https://t1.daumcdn.net/cfile/tistory/11791C404E74C2B719)
+  자료 출처 : [https://t1.daumcdn.net/cfile/tistory/11791C404E74C2B719](https://t1.daumcdn.net/cfile/tistory/11791C404E74C2B719)
+
+  - public
+
+    접근 제한이 없음
+
+  - protected
+
+    같은 패키지 내에서, 다른 패키지의 자손 클래스에서 접근 가능
+
+  - default
+
+    같은 패키지 내에서 접근 가능
+
+  - private
+
+    같은 클래스 내에서 접근 가능
+  
+    |제어자|같은 클래스|같은 패키지|자손 클래스|전체|
+    |:------|:---|:---|:---|:---|
+    |public|O|O|O|O|
+    |protected|O|O|O|X|
+    |default|O|O|X|X|
+    |private|O|X|X|X|
+- 대상에 따른 사용 가능한 접근 지시자
+  
+  |대상|사용가능한 접근 제어자|
+  |:------|:---|
+  |클래스|public, default|
+  |메서드|public, protected, default, private|
+  |멤버변수|public, protected, default, private|
+  |지역변수|없음|
+    
+  
+
+자료참조
+
+자바의 정석 3rd Edition(남궁 성 저)
