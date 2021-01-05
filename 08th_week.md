@@ -49,10 +49,93 @@
 
 ## 인터페이스 레퍼런스를 통해 구현체를 사용하는 방법
 
+- 인터페이스 타입 변수 선언과 구현
+
+  인터페이스 타입의 변수는 동일한 인터페이스를 구현한 클래스로 객체 선언이 가능하다. 밑의 코드와 함께 보자.
+
+    ```java
+    public class Main {
+        public static void main(String[] args) {
+    				//1.
+            Eatable eatable = new Dog();
+            Eatable eatable1 = new Cat();
+    				//2.
+            eatable.eat();
+            eatable1.eat();
+        }
+    }
+    //3.
+    interface Eatable {
+        void eat();
+    }
+    //4.
+    class Dog implements Eatable {
+        @Override
+        public void eat() {
+            System.out.println("멍멍 쩝쩝");
+        }
+    }
+    //5.
+    class Cat implements Eatable {
+        @Override
+        public void eat() {
+            System.out.println("냐옹 쩝쩝");
+        }
+    }
+
+    /*
+    	출력결과
+    	멍멍 쩝쩝
+    	냐옹 쩝쩝
+
+    */
+    ```
+
+  3번을 보면, Eatable이라는 이름을 가진 인터페이스를 생성했다. 추상메서드로 void eat() 메서드를 선언했다. 그 밑에 4번, 5번에는 Eatable 인터페이스를 implements한 클래스 Dog, Cat이 있다.
+
+  다시 1번으로 돌아와서 Eatable 타입의 변수에 Eatable 인터페이스를 구현한 클래스로 객체선언을 한 것을 볼 수 있다.
+
+  2번에서는 선언된 객체의 메서드를 호출했는데, 각 클래스에서 선언된 클래스의 메서드의 구현부대로 실행된다. 각각의 추상메서드를 구현한 메서드는 4번, 5번에 있다.
+
+- 인터페이스 타입의 객체를 선언할때의 특징
+
+  말 그대로 선언하려는 변수의 타입이 인터페이스이기 때문에 구현하려는 객체가 해당 인터페이스를 구현하고 있다면 교체가 가능하다. 이는 서로의 의존성을 낮추어 유지보수 에 용이함을 가져다준다.
+
+  위처럼 객체의 교체가 용이한 이유는 인터페이스의 특징인 추상메서드 구현의 강제성 때문이다. 그렇기 때문에 인터페이스를 구현한 클래스가 적어도 두개 이상이라면 보통의 경우 손쉽게 교체가 가능하다.
+
 ## 인터페이스 상속
+
+- 인터페이스의 상속
+
+  인터페이스는 인터페이스로부터만 상속받을 수 있으며, 클래스와는 달리 다중상속, 즉 여러개의 인터페이스로부터 상속을 받는 것이 가능하다.
+
+    ```java
+    interface Eatable {
+        void eat();
+    }
+
+    interface Runnable {
+        void run();
+    }
+
+    interface Fightable extends Eatable, Runnable {
+        void attack();
+        
+    }
+    ```
+
+  순서대로 인터페이스를 생성하고, 맨 밑의 인터페이스는 두개의 인터페이스를 상속받도록 설정하였다. 인터페이스를 상속받았다고해서 위의 두개의 인터페이스의 추상메서드를 그대로 작성할 필요는 없다. 어차피 구현할 클래스에서 세개의 인터페이스의 모든 추상클래스를 구현해야만 하는건 마찬가지다.
+
+  즉, Fightable 인터페이스 자체에서는 작성된 추상메서드가 하나지만, 상속받은 두개의 추상메서드를 멤버로 추가적으로 가지게 된다.
 
 ## 인터페이스의 기본 메소드 (Default Method), 자바 8
 
 ## 인터페이스의 static 메소드, 자바 8
 
 ## 인터페이스의 private 메소드, 자바
+
+
+
+자료참조
+
+자바의 정석 3rd Edition(남궁 성 저)
