@@ -130,7 +130,107 @@
 
 ## 인터페이스의 기본 메소드 (Default Method), 자바 8
 
+- 자바 8에 새로 추가된 기본 메서드
+
+  자바8 이전에 인터페이스에서는 새로운 메서드를 추가하게 되면 일일이 그 메서드를 구현해야하는 번거로움과 유지보수성이 떨어진다는 단점이 있었다. 그에 대한 대안으로 추상 클래스에 인터페이스를 implement하여 구현하지 않아도 되는 메서드를 만드는 방법을 선택했다. 자바의 특징인 단일 상속을 염두하면 그리 좋은 방안은 아니다.
+
+  그 뒤로 자바 8에서는 인터페이스에 변화가 생겼다 인터페이스의 기본 메서드가 등장하면서 불편함을 해소했다.
+
+- 기본 메서드란?
+
+  기본 메서드란 인터페이스에 메서드 선언이 아닌 구현체를 제공한다. 그러므로 implements한 클래스는 기본 메서드를 구현 할 필요가 없다.
+
+    ```java
+    default void defaultMethod() {
+    	// 구현부
+    }
+    ```
+
+  인터페이스에서 위처럼 코드를 입력하면 기존에 implements 한 클래스들은 컴파일 에러를 일으키지 않는다. 해당 인터페이스를 구현한 클래스를 깨뜨리지 않고 새 기능을 추가할 수 있다.
+
+- 기본메서드의 특징
+  - 인터페이스를 상속받는 인터페이스에서 다시 추상 메소드로 변경할 수 있다.
+
+      ```java
+      interface test1 {
+          default void defaultMethod() {
+              //구현부
+          }
+      }
+
+      interface test2 extends test1 {
+          void defaultMethod();
+      }
+      ```
+
+  - 인터페이스 구현체가 재정의 할 수도 있다.
+
+      ```java
+      public class Main implements test1 {
+          @Override
+          public void defaultMethod() {
+              //구현부
+          }
+      }
+
+      interface test1 {
+          default void defaultMethod() {
+              //구현부
+          }
+      }
+      ```
+
+- 기본 메서드 작성시 주의사항
+
+  기본 메서드는 구현체가 모르게 추가가 되었을 수도 있다. 이유는 인터페이스를 들여다보지 않으면 알 수 없기 때문이다. 이 때문에 없다가 새로 생긴 기본 메서드로 인해 기존에 없던 컴파일 에러를 일으킬 수 있다. 그러므로 반드시 문서화를 통해 알려야한다.
+
 ## 인터페이스의 static 메소드, 자바 8
+
+- 인터페이스의 static 메서드란?
+
+  자바 8이 들어오면서 위에서 다뤘던 기본 메서드와 같이 static 메서드도 같이 등장했다. 원래는 인터페이스에 추상 메서드만 선언이 가능했는데, static 또는 기본 메서드도 같이 선언할 수 있게 되었다. static 메서드는 접근제어자가 항상 public이며, 생략이 가능하다.
+
+- static 메서드의 특징
+
+  위에서 다뤘던 기본메서드와 같이 인터페이스 내에서 구현이 가능하다는 특징이 있지만, implements 하는 클래스에서 재정의(Override)가 불가능 하다는 특징이 있다. 이는 기본 메서드와는 구분되는 차이이다.
+
+    ```java
+    public class Main implements Foo{
+
+        @Override // 필수 구현
+        public void printName(String name) {
+            
+        }
+
+        @Override // override 가능
+        public void printFullName(String firstName, String lastName) {
+
+        }
+        
+        @Override // 오류
+        public static void upperName(String name) {
+            
+        }
+    }
+
+    interface Foo {
+        void printName(String name);
+        
+        default void printFullName(String firstName, String lastName) {
+            System.out.println(lastName + " " + firstName);
+        }
+        
+        static void printUpperName(String name) {
+            System.out.println(name.toUpperCase());
+        }
+    }
+    ```
+
+  위의 코드를 보면 Main 클래스의 upperName() 메서드는 @Override 에서 빨간 밑줄이 생긴다.
+
+  ![img.png](images/img_6.png)
+
+  그러므로 static 메서드를 Override하지 않도록 주의해야 한다.
 
 ## 인터페이스의 private 메소드, 자바
 
