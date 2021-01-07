@@ -234,8 +234,46 @@
 
 ## 인터페이스의 private 메소드, 자바
 
+- 인터페이스 private 메서드
 
+  자바 9버전에서부터 인터페이스에 private 메서드를 사용할 수 있게 됐다. 이전 버전인 자바8버전에서는 default, static 메서드가 나오면서 인터페이스에도 메서드를 구현할 수 있게 되었고, 9버전의 private 메서드가 나오면서 더욱 구현을 세부적으로 할 수 있다는 특징을 갖게 되었다. 하지만 이러한 메서드는 외부에서 볼 수 없기 때문에 번거롭더라도 인터페이스를 사용할 때 내부적으로 구현된 코드들이 있는지 확인해야 한다는 단점아닌 단점도 특징 중 하나이다.
+
+    ```java
+    interface Foo {
+    	default void printName(String firstName) {
+    		System.out.println("Hi " + firstName );
+    		printFullName();
+    	}
+
+    	private void printFullName(String firstName, String lastName) {
+    		System.out.println("Hi " + lastName + " " + firstName + "!");
+    	}
+    }
+    ```
+
+  위처럼 인터페이스 내에 default 메소드에 private 메소드를 추가하여 외부에서 접근이 불가능하고, default 메소드를 보완해주는 구조로 코드가 작성되어있다. 위의 예시처럼 외부에서 접근 할 수 없게 설정하려면 private 메서드를 작성하면 된다.
+
+  덧붙여서 static 키워드도 붙여서 사용이 가능하다.
+
+    ```java
+    interface Foo {
+    	default static void printName(String firstName) {
+    		System.out.println("Hi " + firstName );
+    		printFullName();
+    	}
+
+    	private static void printFullName(String firstName, String lastName) {
+    		System.out.println("Hi " + lastName + " " + firstName + "!");
+    	}
+    }
+    ```
+
+  static 메서드는 인스턴스 메서드에 접근할 수 없다. 이러한 특징을 잘 파악해야 함을 주의해야한다.
 
 자료참조
 
 자바의 정석 3rd Edition(남궁 성 저)
+
+[https://www.inflearn.com/course/the-java-java8/dashboard](https://www.inflearn.com/course/the-java-java8/dashboard)
+
+[https://flyburi.com/605](https://flyburi.com/605)
