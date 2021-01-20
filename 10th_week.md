@@ -159,8 +159,131 @@ Runnable은 말 그대로 인터페이스이기 때문에 인터페이스의 특
   4. TERMINATED
 
      실행을 모두 마치거나 stop() 메서드가 호출되면 쓰레드는 소멸된다.
+  
+- 예제
+
+    ```java
+    public class Main extends Thread {
+        public static void main(String[] args) {
+            Thread thread2 = new Thread(new MyThread2());
+            thread2.start();
+        }
+    }
+
+    class MyThread1 implements Runnable {
+        @Override
+        public void run() {
+            for(long i=0; i<1000000000; i++) {} // 2. RUNNABLE
+
+            try {
+                Thread.sleep(1500);  // 3. TIMED_WAITING
+            } catch(Exception e) {}
+
+            for(long i=0; i<1000000000; i++) {} // 2. RUNNABLE
+        } // 4. TERMINATED
+    }
+
+    class MyThread2 implements Runnable {
+
+        Thread thread1 = new Thread(new MyThread1()); // 1.NEW
+
+        @Override
+        public void run () {
+            while (true) {
+                Thread.State state = thread1.getState();
+                System.out.println(state);
+                if (state == Thread.State.NEW) {
+                    thread1.start();
+                }
+                if (state == Thread.State.TERMINATED) {
+                    break;
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {}
+            }
+        }
+    }
+
+    /*
+    	출력결과
+
+    	NEW
+    	RUNNABLE
+    	RUNNABLE
+    	TIMED_WAITING
+    	TIMED_WAITING
+    	TIMED_WAITING
+    	RUNNABLE
+    	TERMINATED
+    */
+    ```
+
+  위는 두개의 쓰레드로 하나는 쓰레드의 진행을, 또 다른 하나는 진행중인 쓰레드의 상태를 반환하는 구성이다. MyThread1은 쓰레드의 상태를 확인하기위해 구동되는 로직이고, MyThread2는 MyThread1이 구동될때마다의 상태를 0.5초마다 한번씩 출력하도록 설정하였다.
+
+  1번을 보면, MyThread2에서 첫번 째 객체를 선언할 때 NEW, 2번은 쓰레드가 진행중 또는 실행 대기상태 RUNNABLE를, 3번은 잠시 멈추어있을 때 TIMED_WAITING, 4번마지막 메서드가 끝나면 비로소 TERMINATED를 반환한다
 
 ## 쓰레드의 우선순위
+
+쓰레드는 우선순위라는 속성을 가지고 있는데, 이 우선순위에 값에 따라 쓰레드가 얻는 실행시간이 달라진다. 쓰레드가 수행하는 작업의 중요도에 따라 쓰레드의 우선순위를 서로 다르게 지정하여 특정 쓰레드가 더 많은 작업시간을 갖도록 할 수 있다.
+
+- 쓰레드의 우선순위 지정
+
+    ```java
+    void setPriority(int newPriority) //쓰레드 우선순위 설정
+    int getPriority() //쓰레드 우선순위 반환
+
+    public static final int MAX_PRIORITY = 10 //최대 우선순위
+    public static final int MIN_PRIORITY = 1 //최소 우선순위
+    public static final int NORM_PRIORITY = 5 //보통 우선순위
+    ```
+
+  쓰레드가 가질 수 있는 우선순위의 범위는 1~10이며 숫자가 높을수록 우선순위가 높다. 한 가지 더 알아두어야 할 것은 쓰레드의 우선순위는 쓰레드를 생성한 쓰레드로부터 상속받는다는 것이다. main메서드를 수행하는 쓰레드는 우선순위가 5이므로 main메서드 내에서 생성하는 쓰레드의 우선순위는 자동적으로 5가된다.
+
+    ```java
+    public class Main {
+        public static void main(String[] args) throws IOException {
+
+            Thread thread1 = new Thread(new MyThread1());
+            Thread thread2 = new Thread(new MyThread2());
+
+            thread1.setPriority(7);
+
+            thread1.start();
+            thread2.start();
+        }
+    }
+
+    class MyThread1 implements Runnable {
+        @Override
+        public void run() {
+            int num = 500;
+            while(num-- > 0) {
+                System.out.print("하");
+            }
+        }
+    }
+
+    class MyThread2 implements Runnable {
+        @Override
+        public void run() {
+            int num = 500;
+            while(num-- > 0) {
+                System.out.print("깔");
+            }
+        }
+    }
+    ```
+
+  위 예제 코드는 두개의 쓰레드 객체를 생성했다. thread1에 setPriority()메서드를 이용하여 기본 우선순위인 5보다 더 큰 7로 설정하고. 실행해보았다. 아래는 예제를 실행한 결과이다.
+
+  ![images/img_9.png](images/img_9.png)
+
+  여러 번 실행했으나 전체적인 실행 결과는 비슷했다. 우선순위가 낮은 쓰레드가 마지막에 출력되는 형태는 동일했으나 중간중간 순서가 살짝씩 바뀌는것은 실행할 때마다 달랐다.
+
+  위의 결과로 알 수 있는 사실은 우선순위가 높은 쓰레드에게 더 많은 시간을 할당해준 다는 것이다. 그러므로 우선순위가 높은 쓰레드는 더 일찍 로직을 끝마칠 수 있다.
+
+  하지만 싱글코어의 기준에서 쓰레드에 우선순위를 부여하는게 의미가 있지만, 멀티코어의 기준에서는 다르다.  게다가 멀티코어는 OS마다 실행하는 기준이 다르기 때문에 직접 쓰레드의 우선순위를 부여하는것은 큰 의미가 없다.그러므로 쓰레드에 우선순위를 부여하는 것 대신 작업에 우선순위를 두어 PriorityQueue에 담아놓고, 우선순위가 높은 작업이 먼저 처리되도록 하는 것이 더 확실한 방법이라 할 수 있다.
 
 ## Main 쓰레드
 
