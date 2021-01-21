@@ -277,7 +277,7 @@ Runnable은 말 그대로 인터페이스이기 때문에 인터페이스의 특
 
   위 예제 코드는 두개의 쓰레드 객체를 생성했다. thread1에 setPriority()메서드를 이용하여 기본 우선순위인 5보다 더 큰 7로 설정하고. 실행해보았다. 아래는 예제를 실행한 결과이다.
 
-  ![images/img_9.png](images/img_9.png)
+  ![images/img_.png](images/img_9.png)
 
   여러 번 실행했으나 전체적인 실행 결과는 비슷했다. 우선순위가 낮은 쓰레드가 마지막에 출력되는 형태는 동일했으나 중간중간 순서가 살짝씩 바뀌는것은 실행할 때마다 달랐다.
 
@@ -287,6 +287,122 @@ Runnable은 말 그대로 인터페이스이기 때문에 인터페이스의 특
 
 ## Main 쓰레드
 
+메인 메서드(public static void main(String[] args))의 작업을 수행하는 것도 쓰레드이며, 이를 메인 쓰레드라고 한다. 여태 실행을 위해 메인메서드를 실행시켰다면 메인 쓰레드에 의해 쓰레드가 실행됐던 것이다. 덧붙여, 기본적으로 프로그램이 실행되기 위해서는 작업을 수행하는 하나의 쓰레드를 생성하고, 그 쓰레드가 메인 메서드를 호출하여 작업이 수행되도록 하는 것이다.
+
+물론 메인 메서드가 수행을 마치면 프로그램이 종료되지만, 메인 메서드가 수행을 마쳤다 하더라도 다른 스레드가 아직 작업을 마치지 않은 상태라면 프로그램은 종료되지 않는다.
+
+아래는 쓰레드의 흐름을 한눈에 파악할 수 있는 flow diagram이다.
+
+![https://media.geeksforgeeks.org/wp-content/uploads/main-thread-in-java.jpeg](https://media.geeksforgeeks.org/wp-content/uploads/main-thread-in-java.jpeg)
+
+자료 출처 : [https://www.geeksforgeeks.org/main-thread-java/](https://www.geeksforgeeks.org/main-thread-java/)
+
+- Thread.currentThread()
+
+    ```java
+    public class Main {
+        public static void main(String[] args) {
+            Thread r = Thread.currentThread();
+            System.out.println(r.getName());
+        }
+    }
+
+    /*
+    	출력결과
+    	main
+    	
+    	Process finished with exit code 0
+    */
+    ```
+
+  현재 실행되는 쓰레드를 확인하고 싶을 때 Thread.currentThtread() 메서드를 이용하여 객체를 선언할 수 있고, 그 객체를 통해 현재 쓰레드의 정보를 알 수 있다.
+
+  ![images/img_10.png](images/img_10.png)
+
+  자료 출처 : [https://docs.oracle.com/javase/8/docs/api/](https://docs.oracle.com/javase/8/docs/api/)
+
+  덧붙여 설명하자면, 위의 설명에도 알 수 있듯 현재 실행하는 쓰레드 객체 참조를 반환한다.
+
+  다시 돌아와서, 위의 출력결과를 통해 메인쓰레드임을 확인할 수 있다.
+
+- 메인메서드가 종료되고나서도 실행되는 메서드
+
+    ```java
+    public class Main {
+        public static void main(String[] args) {
+            MyThread1 thread1 = new MyThread1();        
+            thread1.start();
+        }
+    }
+
+    class MyThread1 extends Thread {
+        @Override
+        public void run() {
+            exception();
+        }
+
+        void exception() {
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /*
+    	출력결과
+    	java.lang.Exception
+    		at MyThread2.exception(Main.java:20)
+    		at MyThread2.run(Main.java:15)
+    		at java.lang.Thread.run(Thread.java:748)
+    	
+    	Process finished with exit code 0
+    */
+    ```
+
+  위의 코드는 새로 생성한 쓰레드에서 고의적으로 예외를 실행시키도록 설정하였다. 출력결과를 보면 printStackTrace()에 의해 호출스택을 확인할수 있다. 예외가 발생한 당시의 호출스택을 보면 모두 새로 생성한 쓰레드에서 발생한 예외임을 알 수 있다.
+
+  이를 통해 알 수 있는 사실은 호출스택에 메인 메서드가 없었다는 것이고, 이는 메인메서드에서 따로 호출스택을 생성하였다는 것을 알 수 있다.
+
+- 호출 스택이 따로 생성되지 않은 경우
+
+    ```java
+    public class Main {
+        public static void main(String[] args) {
+            Thread thread2 = new Thread(new MyThread2());
+            thread2.run(); // 위의 코드와 다르게 이번에는 run() 메서드로 설정하였다.
+        }
+    }
+
+    class MyThread2 implements Runnable {
+        @Override
+        public void run() {
+            exception();
+        }
+
+        void exception() {
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /*
+    	출력결과
+    	java.lang.Exception
+    		at MyThread2.exception(Main.java:16)
+    		at MyThread2.run(Main.java:11)
+    		at java.lang.Thread.run(Thread.java:748)
+    		at Main.main(Main.java:4)
+    	
+    	Process finished with exit code 0
+    */
+    ```
+
+  위의 코드는 start() 메서드와 run() 메서드의 차이로 발생하는 출력결과를 확인할 수 있다. run()메서드는 단순히 실행만 할 뿐 따로 호출스택을 생성하지 않기 때문에 메인 쓰레드에서 실행됐음을 출력결과에서 확인할 수 있다.
 ## 동기화
 
 ## 데드락
