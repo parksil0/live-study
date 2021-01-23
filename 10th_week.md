@@ -405,10 +405,140 @@ Runnable은 말 그대로 인터페이스이기 때문에 인터페이스의 특
   위의 코드는 start() 메서드와 run() 메서드의 차이로 발생하는 출력결과를 확인할 수 있다. run()메서드는 단순히 실행만 할 뿐 따로 호출스택을 생성하지 않기 때문에 메인 쓰레드에서 실행됐음을 출력결과에서 확인할 수 있다.
 ## 동기화
 
+멀티쓰레드에서 여러 쓰레드가 같은 프로세스의 자원을 공유하여 작업하다보면 작업을 마쳤을 때 의도했던 것과 다른 결과를 얻을 수 있다. 밑의 예시를 통해 알아보자.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Runnable myThread1 = new MyThread1();
+        new Thread(myThread1).start();
+        new Thread(myThread1).start();
+    }
+}
+
+class NoodleStore {
+    //음식집에서 팔 수 있는 면음식의 갯수
+    private int noodle = 10;
+
+    public int getNoodle() {
+        return noodle;
+    }
+
+    public void sellNoodle(int order) {
+        if(noodle >= order) {
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            noodle -= order;
+        }
+    }
+}
+
+class MyThread1 implements Runnable {
+
+    NoodleStore foodStore = new NoodleStore();
+    @Override
+    public void run() {
+        while(foodStore.getNoodle() > 0) {
+            int order = 2;
+            foodStore.sellNoodle(order);
+            System.out.println("팔 수 있는 음식 : " + foodStore.getNoodle());
+        }
+    }
+}
+```
+
+위는 면음식을 파는 음식집을 예시로 구성해보았다. 팔 수 있는 음식은 열 그릇으로 지정해놓고 주문당 두 그릇씩 주문이 들어가도록 설정하였다. 만약 여러 쓰레드가 공유하면서 주문을 하게 된다면,
+
+![images/img_11.png](images/img_11.png)
+
+위의 출력결과로 -2그릇이 주문이 되는 경우가 발생한다.  이러한 오류를 방지하기 위해 한 쓰레드가 진행 중인 작업을 다른 쓰레드가 간섭하지 못하도록 막아야한다. 그러기 위해서는 동기화가 필요하다.
+
+동기화는 진행중인 쓰레드의 작업을 다른쓰레드가 개입하지 못하도록 막는 것을 뜻한다. 보통은 synchronize 키워드를 통해 동기화를 설정한다.
+
+![images/img_12.png](images/img_12.png)
+
+위의 NoodleStore 클래스에 sellNoodle() 메서드이다. 동기화를 설정하려면 메서드 선언부에 synchronize 키워드를 붙이면 된다. 메서드 전체를 지정하는 경우 외에 특정 영역을 지정하는 방법도 있다.
+
+```java
+public void sellNoodle(int order) {
+    synchronized (this) {
+        if(noodle >= order) {
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            noodle -= order;
+        }
+    }
+}
+```
+
+위처럼 메서드가 아닌 특정영역을 동기화하는 경우가 있다. 위의 경우와 방금 설명한 경우, 총 두가지 방식이다.
+
 ## 데드락
+
+데드락은 둘 이상의 쓰레드가 서로를 기다리면서 계속 블락이 되는 것을 뜻한다. 다시말해 서로가 lock을 얻기위해 기다리고 있는데, lock을 잡고 있는 쓰레드도 똑같이 다른 lock을 기다리며 서로 블록 상태에 놓이는 것을 뜻한다
+
+![https://media.geeksforgeeks.org/wp-content/uploads/22-2.png](https://media.geeksforgeeks.org/wp-content/uploads/22-2.png)
+
+자료 출처 : [https://www.geeksforgeeks.org/deadlock-in-java-multithreading/](https://www.geeksforgeeks.org/deadlock-in-java-multithreading/)
+
+위의 자료처럼 서로 각자 자원에 lock을 가지고 있는 상태에서 다른 자원의 lock을 얻기 위해 접근 하다가 교착상태(deadlock)에 빠지게 된다.
+
+```java
+public class Deadlock {
+    static class Friend {
+        private final String name;
+        public Friend(String name) {
+            this.name = name;
+        }
+        public String getName() {
+            return this.name;
+        }
+        public synchronized void bow(Friend bower) {
+            System.out.format("%s: %s"
+                + "  has bowed to me!%n", 
+                this.name, bower.getName());
+            bower.bowBack(this);
+        }
+        public synchronized void bowBack(Friend bower) {
+            System.out.format("%s: %s"
+                + " has bowed back to me!%n",
+                this.name, bower.getName());
+        }
+    }
+
+    public static void main(String[] args) {
+        final Friend alphonse =
+            new Friend("Alphonse");
+        final Friend gaston =
+            new Friend("Gaston");
+        new Thread(new Runnable() {
+            public void run() { alphonse.bow(gaston); }
+        }).start();
+        new Thread(new Runnable() {
+            public void run() { gaston.bow(alphonse); }
+        }).start();
+    }
+}
+
+/*
+	출력결과
+	Alphonse: Gaston  has bowed to me!
+	Gaston: Alphonse  has bowed to me!
+*/
+```
+
+위의 두 친구는 인사를 하는데 인사에 규칙이 있다. 누군가가 상대방에게 인사를 할 때 상대방이 인사를 할때까지 인사를 해야한다. 그렇다면, A가 B에게 인사를 하면 반대로 B도 A에게 인사를 하는 구조이다. 하지만 서로 같이 인사를 하게된다면 계속 서로가 인사를하고있는 모습이 연출된다.
+
+![images/img_13.png](images/img_13.png)
+
+원래라면 위와같은 출력결과가 나와야한다. 위의 예시는 오라클 공식홈페이지에서 가져왔지만 살짝 억지의 느낌이 있어 바로 이해가 되진 않았지만 위의 그림자료와 같이 교착상태에 빠진것이다. 서로 각자의 행위를 하고 있고, 그 행위에서 다른행위로 서로 넘어가려는 행동 때문에 교착상태가 일어나게 된 것이다.
 
 자료참조
 
 자바의 정석 3rd Edition(남궁 성 저)
 
 [https://codingdog.tistory.com/entry/java-thread-start-vs-run-어떤-차이가-있을까요](https://codingdog.tistory.com/entry/java-thread-start-vs-run-%EC%96%B4%EB%96%A4-%EC%B0%A8%EC%9D%B4%EA%B0%80-%EC%9E%88%EC%9D%84%EA%B9%8C%EC%9A%94)
+
+[https://widevery.tistory.com/27](https://widevery.tistory.com/27)
+
+[https://m.blog.naver.com/PostView.nhn?blogId=qbxlvnf11&logNo=220921178603&proxyReferer=https:%2F%2Fwww.google.com%2F](https://m.blog.naver.com/PostView.nhn?blogId=qbxlvnf11&logNo=220921178603&proxyReferer=https:%2F%2Fwww.google.com%2F)
+
+[https://www.geeksforgeeks.org/main-thread-java/](https://www.geeksforgeeks.org/main-thread-java/)tps://www.geeksforgeeks.org/main-thread-java/)
