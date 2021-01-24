@@ -542,3 +542,9 @@ public class Deadlock {
 [https://m.blog.naver.com/PostView.nhn?blogId=qbxlvnf11&logNo=220921178603&proxyReferer=https:%2F%2Fwww.google.com%2F](https://m.blog.naver.com/PostView.nhn?blogId=qbxlvnf11&logNo=220921178603&proxyReferer=https:%2F%2Fwww.google.com%2F)
 
 [https://www.geeksforgeeks.org/main-thread-java/](https://www.geeksforgeeks.org/main-thread-java/)tps://www.geeksforgeeks.org/main-thread-java/)
+
+[https://www.geeksforgeeks.org/deadlock-in-java-multithreading/](https://www.geeksforgeeks.org/deadlock-in-java-multithreading/)
+
+[https://docs.oracle.com/javase/tutorial/essential/concurrency/deadlock.html](https://docs.oracle.com/javase/tutorial/essential/concurrency/deadlock.html)
+
+[https://parkcheolu.tistory.com/19](https://parkcheolu.tistory.com/19)
