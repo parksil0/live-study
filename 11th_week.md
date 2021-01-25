@@ -62,6 +62,38 @@ public static void main(String[] args) {
 
 ## enum이 제공하는 메소드 (values()와 valueOf())
 
+enum이 제공하는 메서드 중 values()와 valueOf() 메서드에 알아보려 한다.
+
+- values()
+
+  열거형 상수가 선언된 순서대로 포함된 배열을 반환한다. 이 메서드는 상수의 반복문을 통해 하나하나 값을 반환하는 형태로 풀어나갈 수 있다.
+
+    ```java
+    for(Direction c : Direction.values()) {
+    	System.out.println(c);
+    }
+    ```
+
+  위는 인텔리제이에서 예시로 values()를 어떻게 코드로 나타내는지에 대해 설명했다. 위는 향상된 for문을 통해 순서대로 처음부터 끝까지 출력할 수 있도록 나타낸 코드이다.
+
+  아래의 예시를 통해 코드를 실행해보자
+
+    ```java
+    for(Direction dir : Direction.values()) {
+        System.out.println(dir + ", " + dir.getKorean() + ", " + dir.getNum());
+    }
+
+    /*
+    	출력결과
+    	EAST, 동, 90
+    	WEST, 서, 270
+    	SOUTH, 남, 180
+    	NORTH, 북, 0
+    */
+    ```
+
+  위의 출력결과를 통해 values() 메서드는 enum이 배열 처럼 순서대로 하나하나 출력되는 모습을 볼 수 있다.
+
 ## java.lang.Enum
 
 ## EnumSet
