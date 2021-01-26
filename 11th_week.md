@@ -96,6 +96,26 @@ enum이 제공하는 메서드 중 values()와 valueOf() 메서드에 알아보�
 
 ## java.lang.Enum
 
+모든 열거형의 조상이 되는 java.lang.Enum 클래스는 10여가지 정도의 메서드가 있지만, 그 중 몇가지 대표적인 메서드를 알아보려한다
+
+- Class<E> getDeclaringClass()
+
+  열거형의 Class객체를 반환한다. 위의 <E>란 Element의 약자로, 배열 요소를 뜻한다.
+
+- String name()
+
+  열거형 상수의 이름을 문자열로 반환한다.
+
+- int ordinal()
+
+  열거형 상수가 정의된 순서를 반환한다. 순서는 0부터 시작한다.
+
+- T valueOf(Class<T> enumType, String name)
+
+  위에서 다룬 내용이니 위의 내용을 확인하면 된다.
+
+위의 네 가지 메서드를 살펴보았는데, 그 외에 values()라는 메서드는 Enum 클래스에 정의되어 있는 메서드는 아니지만 컴파일러가 자동적으로 추가해주는 메서드가 있는데 그 것이 values() 메서드이다. 마찬가지로 values() 메서드도 위에서 다루었으니 확인하면 된다.
+
 ## EnumSet
 
 자료 참조
