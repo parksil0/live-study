@@ -118,6 +118,76 @@ enum이 제공하는 메서드 중 values()와 valueOf() 메서드에 알아보�
 
 ## EnumSet
 
+EnumSet은 Set 인터페이스를 기반으로, enum 요소들을 보다 빠르고 강력하게 결과를 도출하는 역할을 한다.
+
+![https://www.baeldung.com/wp-content/uploads/2018/10/EnumSet-1-2.jpg](https://www.baeldung.com/wp-content/uploads/2018/10/EnumSet-1-2.jpg)
+
+자료참조 : [https://www.baeldung.com/wp-content/uploads/2018/10/EnumSet-1-2.jpg](https://www.baeldung.com/wp-content/uploads/2018/10/EnumSet-1-2.jpg)
+
+위의 사진 자료를 보면 알 수 있듯, AbstractSet을 extend 했고, 그 위에는 Set 인터페이스를 implement한 것을 볼 수 있다. 다음은 EnumSet을 사용할 때 주의사항에 대해 알아보려 한다.
+
+- enum만 포함할 수 있으며 모든 값은 같은 클래스의 enum이여야 한다.
+- null값을 추가할 수 없다. 만약 추가한다면 NPE를 던질 것이다.
+- thread-safe하지 않다. 그러므로 동기화를 해야한다.
+- 요소들은 enum에서 정의된 순서에 따라 저장된다.
+- EnumSet은 fail-safe iterator를 사용하기 때문에 복제를 하는 중에 컬렉션이 수정되더라도 ConcurrentModificationException을 던지지 않는다.
+
+다음은 메서드에 대해 알아보자.
+
+|이름|설명|
+|:---|:---|
+|static allOf(Class<E> elementType)|파라미터의 모든 요소들을 반환한다.|
+|static complementOf(EnumSet<E> s)|지정된 enum에 포함되지 않은 모든 요소를 가진 집합을 반환한다.|
+|static copyOf(Collection<E> c)<br> copyOf(EnumSet<E> s)|파라미터와 같은 EnumSet을 반환한다.|
+|static noneOf(Class<E> elementType)|빈 enumSet을 반환한다.|
+|static of(E e)|enum의 특정 요소를 반환한다.|
+
+
+
+위의 EnumSet과 메서드들을 종합하여 예시를 통해 알아보자.
+
+```java
+public static void main(String[] args) {
+    EnumSet<Direction> es = EnumSet.allOf(Direction.class);
+    System.out.println("es: " + es);
+
+    EnumSet<Direction> es2 = EnumSet.copyOf(es);
+    System.out.println("es2: " + es2);
+
+    EnumSet<Direction> es3 = EnumSet.of(Direction.NORTH, Direction.EAST);
+    System.out.println("es3: " + es3);
+
+    EnumSet<Direction> es4 = EnumSet.noneOf(Direction.class);
+    System.out.println("es4: " + es4);
+
+		EnumSet<Direction> es5 = EnumSet.complementOf(es3);
+    System.out.println("es5: " + es5);
+}
+
+/*
+	출력결과
+	es: [EAST, WEST, SOUTH, NORTH]
+	es2: [EAST, WEST, SOUTH, NORTH]
+	es3: [EAST, NORTH]
+	es4: []
+	es5: [WEST, SOUTH]
+*/
+```
+
+열거형 Direction을 통해 위의 EnumSet을 이용하여 코드를 구성해보았다. 메서드를 소개할 때 공통점은 모두 static 메서드이다. 그리고 위의 코드를 보았을 때 모두 new 연산자를 사용하지 않고 구현 객체를 반환받았다. 그 이유는 abstract 클래스이기 때문이다. 그 외로, 대표적으로 편의와 확장성, 유지보수의 이점때문이라고 보면 된다. 말 그대로 Enum에 Set 인터페이스를 구현했기 때문에 일일이 new 연산자를 사용하여 구현하기보단, Set에 담는다는 목적으로 allOf() 라는 메서드를 사용하면 쉽게 반환받고 사용할 수 있다.
+
+es3 코드를 보면, Direction.NORTH, Direction.EAST로 객체를 구현했지만 출력결과를 보면 EAST, NORTH라고 출력이 되었다. 그 이유는 EnumSet의 주의사항에서 다룬 '*요소들은 enum에서 정의된 순서에 따라 저장된다.*' 라는 특징 때문이다.
+
+그 외 나머지는 메서드 설명에 비교하여 보면 크게 어려움은 없을 것이다.
+
 자료 참조
 
 자바의 정석 3rd Edition(남궁 성 저)
+
+[http://alecture.blogspot.com/2012/11/enumset.html](http://alecture.blogspot.com/2012/11/enumset.html)
+
+[https://www.baeldung.com/java-enumset](https://www.baeldung.com/java-enumset)
+
+[https://docs.oracle.com/javase/8/docs/api/](https://docs.oracle.com/javase/8/docs/api/)
+
+[https://siyoon210.tistory.com/152](https://siyoon210.tistory.com/152)
