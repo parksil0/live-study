@@ -25,8 +25,60 @@
   위의 IO와 NIO의 각각 특징들을 통해 알 수 있는 것은, 채널은 스트림과는 달리 양방향으로 입력과 출력이 가능하다는 것이다. 그렇기 때문에 입출력을 위한 별도의 채널을 만들 필요가 없으며, 채널에서 데이터를 주고받을 때 기본적으로 버퍼를 사용한다는 특징을 가지고 있다.
 
 ## InputStream과 OutputStream
+InputStream과 OutputStream은 모든 바이트기반의 스트림의 조상이다. 또한 프로그램이 종료될 때, 사용하고 닫지 않은 스트림을 JVM이 자동적으로 닫아주지만, 스트림을 사용해서 모든 작업을 마치고 난 후에는 close() 메서드를 호출하여 반드시 닫아주어야 한다.
+
+
+
+- InputStream
+  
+  |메서드 명|설명|
+  |---|---|
+  |int available()|스트림으로부터 읽어 올 수 있는 데이터의 크기를 반환한다.|
+  |void close()|스트림을 닫음으로써 사용하고 있던 자원을 반환한다.|
+  |void mark(int readlimit)|현재위치를 표시해 놓는다. 후에 reset()에 의해 표시해 놓은 위치로 다시 돌아갈 수 있다. readlimit은 되돌아갈 수 있는 byte의 수이다.|
+  |boolean markSupport|mark()와 reset()을 지원하는지를 알려준다. mark()와 reset()기능을 지원하는 것은 선택적이므로, mark()와 reset()을 사용하기 전에 markSupported()를 호출해서 지원여부를 확인해봐야한다.|
+  |abstract int read()|1 byte를 읽어온다(0 ~ 255). 더 이상 읽어 올 데이터가 없으면 -1을 반환한다. abstract메서드라서 InputStream의 자손들은 자신의 상황에 맞게 구현해야한다.|
+  |int read(byte[] b)|배열 b의 크기만큼 읽어서 배열을 채우고 읽어 온 데이터의 수를 반환한다. 반환하는 값은 항상 배열의 크기보다 작거나 같다.|
+  |int read(byte[] b, int off, int len)|최대 len개의 byte를 읽어서, 배열 b의 지정된 위치(off)부터 저장한다. 실제로 읽어올 수 있는 데이터가 len개보다 적을 수 있다.|
+  |void reset()|스트림에서의 위치를 마지막으로 mark()이 호출되었던 위치로 되돌린다.|
+  |long skip(long n)|스트림에서 주어진 길이(n)만큼을 건너뛴다.|
+
+- OutputStream
+  
+  |메서드 명|설명|
+  |---|---|
+  |void close()|입력소스를 닫음으로써 사용하고 있던 자원을 반환한다.|
+  |void flush()|스트림의 버퍼에 있는 모든 내용을 출력소스에 쓴다.|
+  |abstract void write(int b)|주어진 값을 출력소스에 쓴다.|
+  |void write(byte[] b)|주어진 배열 b에 저장된 모든 내용을 출력소스에 쓴다.|
+  |void write(byte[] b, int off, int len)|주어진 배열 b에 저장된 내용 중에서 off번째로부터 len개 만큼만을 읽어서 출력소스에 쓴다.|
 
 ## Byte와 Character 스트림
+
+- 바이트기반 스트림
+
+  스트림은 바이트단위로 데이터를 전송하며 입출력 대상에 따라 다음과 같은 입/출력 스트림이 있다.
+
+  |입력 스트림|출력 스트림|입출력 대상의 종류|
+  |---|---|---|
+  |FileInputStream|FileOutputStream|파일|
+  |ByteArrayInputStream|ByteArrayOutputStream|메모리(byte배열)|
+  |PipedInputStream|PipedOutputStream|프로세스(프로세스간의 통신)|
+  |AudioInputStream|AudioOutputStream|오디오장치|
+
+  위와 같이 여러 종류의 입출력 스트림이 있으며, 어떠한 대상에 대해 작업을 할 것인지, 입력을 할 것인지 출력을 할 것인지에 따라 해당 스트림을 선택해서 사용하면 된다.
+
+  위는 모두 InputStream과 OutputStream의 자손들이며 각각 읽고 쓰는데 필요한 추상메서드를 자신에 맞게 구현되었다.
+
+  |InputStream|OutputStream|
+  |---|---|
+  |abstract int read()|abstract void write(int b)|
+  |int read(byte[] b)|void write(byte[] b)|
+  |int read(byte[] b, int off, int len)|void write(byte[] b, int off, int len)|
+
+  위의 표에서 read()와 write()는 입출력의 대상에 따라 쓰는 방법이 다를 것이기 때문에 각 상황에 맞게 구현하라는 의미에서 추상메서드로 정의되어 있다. 나머지는 추상메서드가 아니지만 두 메서드가 구현되어야만 사용할 수 있기 때문에 구현하지 않으면 사용할 수 없다.
+
+- 문자기반 스트림
 
 ## 표준 스트림 (System.in, System.out, System.err)
 
