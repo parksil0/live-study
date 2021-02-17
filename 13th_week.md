@@ -80,7 +80,77 @@ InputStream과 OutputStream은 모든 바이트기반의 스트림의 조상이�
 
 - 문자기반 스트림
 
+  바이트 기반의 스트림은 입출력의 단위가 1 byte이다. Java에서는 한 문자를 의미하는 char형이 1 byte가 아닌 2 byte로, 바이트 기반의 스트림으로 2 byte인 문자를 처리하는 데는 어려움이 있다. 이 점을 보완하기 위해 문자 기반의 스트림이 제공된다. 문자 데이터를 입출력할 때는 바이트 기반 스트림 대신 문자 기반 스트림을 사용하면 된다.
+  
+  |바이트 기반 스트림|문자 기반 스트림|
+  |---|---|
+  |FileInputStream<br>FileOutputStream|FileReader<br>FileWriter|
+  |ByteArrayInputStream<br>ByteArrayOutputStream|CharArrayReader<br>CharArrayWriter|
+  |PipedInputStream<br>PipedOutputStream|PipedReader<br>PipedWriter|
+  |StringBufferInputStream(deprecated)<br>StringBufferOutputStream(deprecated)|StringReader<br>StringWriter|
+
+  InputStream은 Reader로, OutputStream은 Writer로 생각하면 된다. 예시로, FileInputStream은 FileReader로, FileOutputStream은 FileWriter로 대체가 가능하다. 단, 예외로 ByteArrayInputStream과 ByteArrayOutputStream은 CharArrayReader와 CharArrayWriter로 사용하면된다.
+
+  |InputStream|Reader|
+  |---|---|
+  |abstract int read()<br>int read(byte[] b)<br>int read(byte[] b, int off, int len)|int read()<br>int read(char[] cbuf)<br>abstact int read(char[] cbuf, int off, int len)|
+
+  |OutputStream|Writer|
+  |---|---|
+  |abstract void write(int b)<br>void write(byte[] b)<br>void write(byte[]b, int off, int len)|void write(int c)<br>void write(char[] cbuf)<br>abstract void write(char[] cbuf, int off, int len)<br>void write(String str)<br>void write(String str, int off, int len)|
+
+  바이트 기반 스트림과 문자 기반 스트림의 읽기와 쓰기에 사용되는 메서드를 비교하였다. 매개변수로 byte 배열 대신 char 배열로 바뀌었다는 것과 추상 메서드가 달라진 것을 차이점으로 볼 수 있다.
+
+  다음은 보조 스트림으로, 사용 목적과 방식은 바이트 기반 보조 스트림과 다를게 없다.
+
+  |바이트 기반 보조 스트림|문자 기반 보조 스트림|
+  |---|---|
+  |BufferedInputStream<br>BufferedOutputStream|BufferedReader<br>BufferedWriter|
+  |FilterInputStream<br>FilterOutputStream|FilterReader<br>FilterWriter|
+  |LineNumberInputStream(deprecated)|LineNumberReader|
+  |PrintStream|PrintWriter|
+  |PushbackInputStream|PushbackReader|
+
 ## 표준 스트림 (System.in, System.out, System.err)
+
+표준 스트림은 콘솔을 통한 데이터 입력과 콘솔로의 데이터 출력을 의미한다. 자바에서는 표준 입출력(standard I/O)을 위해 세 가지 입출력 스트림, System.in, System.out, System.err을 제공하는데, 이 들은 자바 어플리케이션의 실행과 동시에 사용할 수 있게 자동적으로 생성되기 때문에 별도로 생성하는 코드를 생성하지 않고도 사용이 가능하다.
+
+![images/img_21.png](images/img_21.png)
+
+위 System 클래스의 in, out, err 메서드는 모두 static 변수들이다. 타입을 보면 InputStream, PrintStream이지만 실제로 버퍼를 이용하는 BufferedInputStream과 BufferedOutputStream의 인스턴스를 사용한다.
+
+- System.in : 콘솔로부터 데이터를 입력받는데 사용
+
+    ```jsx
+    import java.io.*;
+
+    public class Test {
+        public static void main(String[] args) throws IOException {
+            int input = 0;
+
+            while((input = System.in.read()) != -1) {
+                System.out.println("input: " + input + ", char input: " + (char)input);
+            }
+        }
+    }
+    ```
+
+  ![images/img_22.png](images/img_22.png)
+
+  hi라고 입력했을 때 read() 메서드가 -1를 출력할 때까지 반복문이 돌아가는 구성이다. 엔터키를 입력하면 입력대기상태에서 벗어나 입력된 데이터를 모두 읽는 구조이다. 마지막에 빈 문자열이 생기는 이유는 엔터키의 입력 때문이다. 엔터키를 입력하는 것은 특수문자 \n이 입력되는 것으로 간주된다. 그렇기 때문에 맨 마지막은 빈 문자열을 출력한다. 이러한 불편함을 해소하고자 BufferedReader의 readLine()을 사용하는 것도 방법 중 하나이다.
+
+- System.out : 콘솔로 데이터를 출력하는데 사용
+
+  위의 사진자료에서 알 수 있듯 System.out.println()을 통해 출력이 된 형태임을 알 수 있다.
+
+- System.err : 콘솔로 데이터를 출력하는데 사용
+
+  만약 System.err.println()으로 설정한다면,
+
+  ![images/img_23.png](images/img_23.png)
+
+
+  평소 예외나 오류가 발생했을 때의 글씨색으로 출력되는 것을 확인할 수 있다. 이를 통해 알 수 있는 사실은 System.err은 특별한 상황에서만 사용됨을 짐작할 수 있다.
 
 ## 파일 읽고 쓰기
 
