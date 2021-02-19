@@ -154,6 +154,117 @@ InputStream과 OutputStream은 모든 바이트기반의 스트림의 조상이�
 
 ## 파일 읽고 쓰기
 
+파일은 기본적이면서도 가장 많이 사용되는 입출력 대상이기 때문에 중요하다. 자바에서는 File클래스를 통해서 파일과 디렉토리를 다룰 수 있도록 하고있다. 그래서 File 인스턴스는 파일일 수 있고 디렉토리일 수 있다. 아래는 File 생성자이다.
+
+|생성자 / 메서드|설명|
+|---|---|
+|File(String fileName)|주어진 문자열(fileName)을 이름으로 갖는 파일을 위한 File 인스턴스를 생성한다.파일 뿐 아니라 경로도 같은 방법으로 다룬다.|
+|File(String pathName, String fileName)<br>File(File pathName, String fileName)|파일의 경로와 이름을 따로 분리해서 지정할 수 있도록 한 생성자. 이 중 두번째 것은 경로를 문자열이 아닌 File인스턴스인 경우를 위해 제공된 것이다.|
+|File(URI uri)|지정된 uri로 파일을 생성|
+|String getName()|파일 이름을 String으로 변환|
+|String getPath()|파일이름을 String으로 변환|
+
+더 자세하게 알고 싶다면 [링크](https://docs.oracle.com/javase/7/docs/api/java/io/File.html, "java file link")를 통해 확인할 수 있다.
+
+```java
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File dir = new File("c:\\myFolder");
+        File f = new File(dir, "myFile.java");
+
+				//File f2 = new File("c:\\myFolder", "myFile.java");
+
+        System.out.println(f.toString());
+    }
+}
+```
+
+![images/img_24.png](images/img_24.png)
+
+File 타입의 dir은 경로를, f는 파일 이름을 설정하였다. f의 생성자 파라미터를 보면 첫번째는 경로를, 두번째는 파일을 설정하였고, 출력결과를 보면 생성자가 설정한 경로와 파일이 출력되는 것을 확인할 수 있다. 그리고 주석 부분은 위의 두줄을 한 줄로 표현한 것이다.
+
+다음은 파일의 메서드를 알아보자
+
+|메서드|설명|
+|---|---|
+|boolean exist()|파일이 존재하는지 검사한다.|
+|boolean delete()|파일을 삭제한다.|
+|boolean createNewFile()|아무런 내용이 없는 새로운 파일을 생성한다.|
+|boolean mkdir()<br>boolean mkdirs()|파일에 지정된 경로로 디렉토리(폴더)를 생성, 성공하면 true, mkdirs는 필요하면 부모 디렉토리까지 생성|
+
+파일의 메서드 전체를 확인하고 싶다면 [링크](https://docs.oracle.com/javase/7/docs/api/java/io/File.html, "java file link")를 통해 확인할 수 있다.
+
+```java
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File dir = new File("c:\\myFolder");
+        File f = new File(dir, "myFile.java");
+
+        if(!dir.exists()) {
+            System.out.println("경로를 생성합니다");
+            dir.mkdir();
+        } else {
+            System.out.println("경로 생성에 실패하였습니다.");
+        }
+
+        if(!f.exists()) {
+            System.out.println("파일을 생성합니다.");
+            f.createNewFile();
+        } else {
+            System.out.println("파일 생성에 실패하였습니다.");
+        }
+
+    }
+}
+```
+
+위는 경로와 파일이 존재하는지 확인하고, 없으면 생성하는 코드를 작성했다. exist()는 존재하는지를, createNewFile()과 mkdir()은 각각 파일과 경로를 생성하는 메서드이다. 아래는 출력결과와 경로이다.
+
+![images/img_25.png](images/img_25.png)
+
+![images/img_26.png](images/img_26.png)
+
+첫번째 자료는 출력결과를, 두번째 자료는 실제 경로에 생성이 되었는지 확인할 수 있다.
+
+```java
+public class Test {
+    public static void main(String[] args){
+        try{
+            File f= new File("c:\\myFolder", "text.txt");
+
+            if(!f.exists()) {
+                System.out.println("완료");
+                f.createNewFile();
+            }
+            PrintWriter pw = new PrintWriter(f);
+            pw.println("hello world!");
+            pw.println("스터디 할래?");
+
+            pw.close();
+
+            FileReader fr = new FileReader(f);
+            int data = 0;
+            while( (data = fr.read() ) != -1 ) {
+                System.out.print((char)data);
+            }
+            fr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+위는 PrintWriter로 지정된 파일에 값을 입력하고, FileReader를 통해 값을 출력하는 구조이다. PrintWriter의 println() 메서드를 통해 값을 입력하고, FileReader의 read()를 통해 값을 출력하는 모습을 볼 수 있다. 아래는 출력결과와 파일 내용이다.
+
+![images/img_27.png](images/img_27.png)
+
+![images/img_28.png](images/img_28.png)
+
 자료참조
 
 자바의 정석 3rd Edition(남궁 성 저)
