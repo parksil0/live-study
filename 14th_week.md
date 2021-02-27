@@ -70,9 +70,164 @@
 
 ## 제네릭 주요 개념 (바운디드 타입, 와일드 카드)
 
+- 바운디드 타입
+
+  타입 매개변수 T에 지정할 수 있는 타입의 종류는 모든 종류가 가능하며 그 중 한 종류의 타입만 저장할 수 있다. 게다가 'extends'라는 키워드를 사용하여 타입의 종류를 제한하는 방법도 있다.예를 들어,
+
+    ```java
+    public class Test {
+        public static void main(String[] args) {
+            FruitBox<Grape> list = new FruitBox<>();
+        }
+    }
+
+    class FruitBox<T extends Fruit> {
+        //...
+    }
+
+    class Fruit {
+        //...
+    }
+
+    class Grape extends Fruit {
+        //...
+    }
+    ```
+
+  중간의 'FruitBox' 클래스의 타입지정 부분을 보면 '<T extends Fruit>'이라는 키워드가 보일것이다. 저 부분이 바운디드된 타입이다. Fruit을 포함한 상속받은 자식 클래스들도 타입에 허용이 된다는 뜻이다. 또한 타입 매개변수에 Object를 대입하면 모든 종류의 객체를 저장할 수 있게 된다.
+
+  만일 클래스가 아닌 인터페이스를 구현해야 한다는 제약이 필요하다 하더라도 'implements'가 아닌 'extends'를 사용해야 한다는 점이 바운디드 타입을 사용하면서의 주의해야할 점이다.
+
+  클래스의 자손이면서 인터페이스를 구현해야 한다면 '&' 키워드로 연결할 수 있다.
+
+    ```java
+    public class Test {
+        public static void main(String[] args) {
+            FruitBox<Grape> list = new FruitBox<>();
+        }
+    }
+
+    class FruitBox<T extends Fruit & Eatable & Cuttable> {
+        //...
+    }
+
+    class Fruit {
+        //...
+    }
+
+    class Grape extends Fruit implements Eatable, Cuttable {
+        //...
+    }
+
+    interface Eatable {
+
+    }
+
+    interface Cuttable {
+
+    }
+    ```
+
+  위의 예제에서 처음의 예제와 다른 점이라면, 인터페이스의 추가 부분이다. 그리고 'FruitBox' 클래스의 타입 지정 부분에서 '&' 키워드와 인터페이스가 추가되었다. 위의 코드를 통해 알 수 있는 사실은, 자바 클래스에서의 상속과 인터페이스 구현 부분이 일치한다. 'extends'로 사용할 수 있는 클래스는 하나만 가능하며, 인터페이스는 여러개가 허용된다.
+
+- 와일드 카드
+
+  와일드 카드는 기호 '?'로 표현하며, 타입을 지정할 수 없다. 그렇다면 '?' 기호는 Object 타입과는 다를게 없게 된다. 그렇기 때문에 'extends' 또는 'super'로 상한과 하한으로 범위를 지정할 수 있다.
+
+  |종류|설명|
+  |---|---|
+  |<? extends T>|와일드 카드의 상한 제한, T와 그 자손들만 가능|
+  |<? super T>|와일드 카드의 하한 제한, T와 그 조상들만 가능|
+  |<?>|제한 없음. 모든 타입이 가능. <? extends Object>와 동일|
+
 ## 제네릭 메소드 만들기
 
+메서드의 선언부에 제네릭 타입이 선언된 메서드를 제네릭 메서드라 하며, 제네릭 타입의 선언 위치는 반환 타입 바로 앞이다.
+
+```java
+static <T> void sort(List<T> list, Comparator<? super T> c)
+```
+
+위는 'Collections.sort()' 메서드이며, 위에서 설명한 제네릭 메서드이다. 제네릭 클래스에 정의된 타입 매개변수와 제네릭 메서드에 정의된 타입 매개변수는 별개의 것이며, 같은 타입 문자 'T'를 사용해도 같은 것이 아니라는 것에 유의해야 한다.
+
+```java
+class FruitBox<T extends Fruit> extends Box<T>{
+    //...
+    static <T> void sort(List<T> list, Comparator<? super T> c) {
+        
+    }
+}
+```
+
+클래스에서 정의한 'T'와 메서드에서 정의한 'T'는 타입 문자만 같을 뿐 서로 다른 것이다.
+
+덧붙여 설명하자면 static 멤버에는 타입 매개변수를 사용할 수 없지만, 이처럼 메서드에 지네릭 타입을 선언하고 사용하는 것은 가능하다.
+
 ## Erasure
+
+컴파일러는 제네릭 타입을 이용해서 소스파일을 체크하고, 필요한 곳에 형변환을 넣어준다. 그리고 제네릭 타입을 제거한다. 즉, 컴파일 된 파일에는 제네릭 타입에 대한 정보가 없다. 그 이유는 이전의 소스코드와의 호환성을 유지하기 위해서이다.
+
+1. 먼저 제네릭 타입을 제거하기 전 제네릭 타입의 바운드를 제거한다.
+
+```java
+//before
+class Box<T extends Fruit> { 
+	void add(T t) {
+		//...
+	}
+}
+
+//after
+class Box {
+	void add(Fruit t) {
+		//...
+	}
+}
+
+```
+
+before 부분을 보면 제네릭 타입의 바운드가 있고, after에서는 입력된 타입으로 변환되었다.
+
+2. 제네릭 타입을 제거한 후 타입이 일치하지 않으면, 형변환을 추가한다.
+
+```java
+//before
+T get(int i) {
+	return list.get(i);
+}
+
+//after
+Fruit get(int i) {
+	return (Fruit)list.get(i);
+}
+```
+
+List의 get() 메서드는 Object 타입을 반환하므로 형변환이 필요한 경우이다.
+
+- 만약 와일드 카드가 포함되어 있는 경우
+
+    ```java
+    //before
+    static Juice makeJuice(FruitBox<? extends Fruit> box) {
+    	String tmp = "";
+    	for(Fruit f : box.getList()) {
+    		tmp += f + " ";
+    	}
+    	return new Juice(tmp);
+    }
+
+    //after
+    static Juice makeJuice(FruitBox<? extends Fruit> box) {
+    	String tmp = "";
+    	Iterator ite = box.getList().iterator();
+    	while(ite.hasNext()) {
+    		tmp += (Fruit)ite.next() + " ";
+    	}
+    	return new Juice(tmp);
+    }
+    ```
+
+  다음과 같이 적절한 타입으로의 형변환이 추가된다.
 
 자료참조
 
