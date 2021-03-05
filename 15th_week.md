@@ -139,6 +139,50 @@ interface FI {
 
 ## 메소드, 생성자 레퍼런스
 
+- 메서드 레퍼런스
+
+메서드 레퍼런스는 static 변수처럼 다룰 수 있게 해준다. 메서드 레퍼런스는 코드를 간략히 하는데 유용해서 많이 사용된다. 다음은 메서드 참조를 이용하여 람다식을 보다 간략하게 만들 수 있는 코드 예제를 보자
+
+```java
+import java.util.function.Function;
+
+public class Test {
+    public static void main(String[] args) {
+        Function<String, Integer> f = Integer::parseInt;
+        int num = f.apply("5");
+        System.out.println(num); //5
+
+				//Function<String, Integer> f = (String s) -> Integer.parseInt(s);
+    }
+}
+```
+
+메인 메서드 바로 아래 줄의 코드가 메소드 레퍼런스를 이용하여 변경된 메서드이다. 원래라면 주석처리 된 부분처럼 작성할텐데, 메소드 레퍼런스를 이용한다면 더 간결하게 작성 할 수 있다.
+
+위의 메서드 참조에서 람다식의 일부가 생략되었지만, 컴파일러는 생략된 부분을 우항의 parseInt메서드의 선언부로부터, 또는 좌변의 Function 인터페이스에 지정된 제네릭 타입으로부터 쉽게 알아낼 수 있다.
+
+위는 메서드의 종류 별 람다, 메서드 참조방법에 대해 정리된 표이다. 그리고 하나의 메서드만 호출하는 람다식은 '클래스이름::메서드이름' 또는 '참조변수::메서드이름'으로 바꿀 수 있다.
+
+- 생성자 레퍼런스
+
+생성자를 호출하는 람다식도 메서드 참조로 변환할 수 있다.
+
+```java
+// 1.
+Supplier<MyClass> s = () -> new MyClass(); //람다식
+Supplier<MyClass> s = MyClass::new; // 메서드 참조
+
+// 2.
+Function<Integer. MyClass> f = (i) -> new MyClass(i); //람다식
+Function<Integer. MyClass> f = MyClass::new; //메서드 참조
+
+// 3.
+Function<Integer, int[]> f = x -> new int[x]; //람다식
+Function<Integer, int[]> f = int[]::new; //메서드 참조
+```
+
+1번은 일반적으로 람다식을 메서드 참조로 변환하는 예지이다. 2번은 매개변수가 있는 생성자의 경우, 배열을 생성할때는 3번과 같이 생성자 레퍼런스를 통해 람다식을 구현할 수 있다.
+
 자료참조
 
 자바의 정석 3rd Edition(남궁 성 저)
