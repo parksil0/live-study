@@ -137,6 +137,12 @@ interface FI {
 
 ## Variable Capture
 
+자바 8부터는 final을 생략할 수 있는 경우가 있다. 이를 effective final이라고 하는데, effective final은 해당하는 변수가 어디에서도 변경하지 않는 경우 컴파일러가 final이라고 판단한다.
+
+만약 익명의 인스턴스에서 외부의 변수를 참조할 때 final 키워드가 없다면 에러를 발생시킨다. 위에서 봤듯, 이때 명시적으로 final을 붙여주거나 컴파일러가 effective final이라고 판단하면 사용이 가능하다.
+
+이처럼 익명 클래스, 로컬 클래스, 람다 총 세개의 식은 컴파일러가 필요한 정보를 외부의 변수를 복사하여 넘겨주는데 이를 variable capture라고 한다.
+
 ## 메소드, 생성자 레퍼런스
 
 - 메서드 레퍼런스
@@ -186,3 +192,5 @@ Function<Integer, int[]> f = int[]::new; //메서드 참조
 자료참조
 
 자바의 정석 3rd Edition(남궁 성 저)
+
+[https://futurecreator.github.io/2018/08/02/java-lambda-variable-scope/](https://futurecreator.github.io/2018/08/02/java-lambda-variable-scope/)
